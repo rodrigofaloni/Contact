@@ -21,5 +21,21 @@ namespace Contacts.Domain.Interface.Service
         /// <param name="id">The identifier.</param>
         /// <returns>Return the contact.</returns>
         Contact GetContact(string id);
+
+        /// <summary>
+        /// Amounts the people same CPF.
+        /// </summary>
+        /// <param name="cpf">The CPF.</param>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the amount.</returns>
+        int AmountPeopleSameCpf(string cpf, string id);
+
+        /// <summary>
+        /// Amounts the people same CPF.
+        /// </summary>
+        /// <param name="cnpj">The cnpj.</param>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the amount.</returns>
+        int AmountPeopleSameCnpj(string cnpj, string id);
     }
 }

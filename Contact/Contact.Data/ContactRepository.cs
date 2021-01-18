@@ -31,7 +31,7 @@ namespace Contacts.Data
         {
             return this._context.Set<Contact>()
                 .Include(x => x.Person)
-                .ThenInclude(x=> x.NaturalPerson)
+                .ThenInclude(x => x.NaturalPerson)
                 .Include(x => x.Person)
                 .ThenInclude(x => x.LegalPerson)
                 .Include(x => x.Person)
@@ -54,6 +54,30 @@ namespace Contacts.Data
                 .ThenInclude(x => x.LegalPerson)
                 .Include(x => x.Person)
                 .ThenInclude(x => x.Address).First(x => x.Id == id);
+        }
+
+        /// <summary>
+        /// Amounts the people same CPF.
+        /// </summary>
+        /// <param name="cpf">The CPF.</param>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the amount.</returns>
+        public int AmountPeopleSameCpf(string cpf, string id)
+        {
+            var qtde = this._context.Set<Contact>().Count(e => e.Person.NaturalPerson.Cpf == cpf && e.Id != id);
+            return qtde;
+        }
+
+        /// <summary>
+        /// Amounts the people same CPF.
+        /// </summary>
+        /// <param name="cnpj>The cnpj.</param>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the amount.</returns>
+        public int AmountPeopleSameCnpj(string cnpj, string id)
+        {
+            var qtde = this._context.Set<Contact>().Count(e => e.Person.LegalPerson.Cnpj == cnpj && e.Id != id);
+            return qtde;
         }
     }
 }

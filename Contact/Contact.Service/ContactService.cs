@@ -48,5 +48,27 @@ namespace Contacts.Service
         {
             return this.contactRepository.GetContact(id);
         }
+
+        /// <summary>
+        /// Amounts the people same CPF.
+        /// </summary>
+        /// <param name="cpf">The CPF.</param>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the amount.</returns>
+        public int AmountPeopleSameCpf(string cpf, string id)
+        {
+            return this.contactRepository.AmountPeopleSameCpf(cpf, id);
+        }
+
+        /// <summary>
+        /// Amounts the people same CPF.
+        /// </summary>
+        /// <param name="cnpj">The cnpj.</param>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the amount.</returns>
+        public int AmountPeopleSameCnpj(string cnpj, string id)
+        {
+            return this.contactRepository.AmountPeopleSameCnpj(cnpj, id);
+        } 
     }
 }

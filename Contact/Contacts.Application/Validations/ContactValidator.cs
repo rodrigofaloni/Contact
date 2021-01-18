@@ -78,11 +78,23 @@ namespace Contacts.Application.Validations
                     {
                         throw new Exception("The CPF informed is invalid.");
                     }
+
+                    if (this._contactService.AmountPeopleSameCpf(contact.Cpf, contact.Id) > 0)
+                    {
+                        throw new Exception("There is already a person registered with this same cpf.");
+                    }
                 }
 
                 if (!contact.Birthday.HasValue)
                 {
                     throw new Exception("The field birthday is required.");
+                }
+                else
+                {
+                    if (contact.Birthday.Value.Date >= DateTime.Now.Date)
+                    {
+                        throw new Exception("The birthday date must be less than today's date.");
+                    }
                 }
             }
             else
@@ -106,6 +118,11 @@ namespace Contacts.Application.Validations
                     if (!ValidationHelper.CnpjValidator(contact.Cnpj.Replace(".", string.Empty).Replace("-", string.Empty)))
                     {
                         throw new Exception("The CNPJ informed is invalid.");
+                    }
+
+                    if (this._contactService.AmountPeopleSameCnpj(contact.Cnpj, contact.Id) > 0)
+                    {
+                        throw new Exception("There is already a person registered with this same cnpj.");
                     }
                 }
             }
