@@ -26,7 +26,7 @@ namespace Contacts.Data
                 .ThenInclude(x => x.Address).ToList();
         }
 
-        public Contact GetContact(long id)
+        public Contact GetContact(string id)
         {
             return this._context.Set<Contact>()
                 .Include(x => x.Person)

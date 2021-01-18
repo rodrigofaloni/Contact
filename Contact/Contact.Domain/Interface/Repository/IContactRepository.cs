@@ -11,6 +11,6 @@ namespace Contacts.Domain.Interface.Repository
     {
         IList<Contact> ListContacts();
 
-        Contact GetContact(long id);
+        Contact GetContact(string id);
     }
 }

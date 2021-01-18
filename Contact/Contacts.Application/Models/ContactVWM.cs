@@ -11,7 +11,7 @@ namespace Contacts.Application.Models
 {
     public class ContactVWM
     {
-        public long Id { get; set; }
+        public string Id { get; set; }
 
         public EnumTypePerson Type { get; set; }
 

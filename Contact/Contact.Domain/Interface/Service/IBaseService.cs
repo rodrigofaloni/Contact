@@ -10,7 +10,7 @@ namespace Contacts.Base.Interface
     {
         IQueryable<T> List();
 
-        T GetById(long id);
+        T GetById(string id);
 
         void Insert(T entidade);
 
@@ -22,6 +22,6 @@ namespace Contacts.Base.Interface
         /// Gets the next identifier.
         /// </summary>
         /// <returns>Return de next identifier.</returns>
-        long GetNextId();
+        string GetNextId();
     }
 }

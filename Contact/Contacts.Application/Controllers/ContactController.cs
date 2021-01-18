@@ -52,7 +52,7 @@ namespace Contacts.Application.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddOrEdit(int id = 0)
+        public IActionResult AddOrEdit(string id)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace Contacts.Application.Controllers
 
                 ViewBag.Countries = HelperCountry.GetAllCountries();
 
-                if (id == 0)
+                if (string.IsNullOrEmpty(id))
                 {
                     return View(new ContactVWM());
                 }
@@ -117,7 +117,7 @@ namespace Contacts.Application.Controllers
             {
                 var nextId = _servico.GetNextId();
 
-                if (contact.Id == 0)
+                if (string.IsNullOrEmpty(contact.Id))
                 {
                     ContactValidator validator = new ContactValidator(_servico);
                     validator.InsertValidator(contact);
@@ -222,7 +222,7 @@ namespace Contacts.Application.Controllers
 
 
         // GET: Employee/Delete/5
-        public IActionResult Delete(int id)
+        public IActionResult Delete(string id)
         {
             try
             {

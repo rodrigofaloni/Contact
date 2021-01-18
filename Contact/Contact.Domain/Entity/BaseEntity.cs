@@ -8,6 +8,6 @@
         /// <summary>
         /// Recupera ou define o id.
         /// </summary>
-        public virtual long Id { get; set; }
+        public virtual string Id { get; set; }
     }
 }

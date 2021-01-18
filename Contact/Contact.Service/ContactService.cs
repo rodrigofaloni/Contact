@@ -31,7 +31,7 @@ namespace Contacts.Service
             return this.contactRepository.ListContacts();
         }
 
-        public Contact GetContact(long id)
+        public Contact GetContact(string id)
         {
             return this.contactRepository.GetContact(id);
         }

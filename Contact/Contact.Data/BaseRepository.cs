@@ -2,6 +2,7 @@
 using Contacts.Base.Interface;
 using Contacts.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace Contacts.Base.Repository
@@ -74,7 +75,7 @@ namespace Contacts.Base.Repository
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Return the entity.</returns>
-        public T GetById(long id)
+        public T GetById(string id)
         {
             var entidade = _context.Set<T>().Find(id);
             return entidade;
@@ -84,16 +85,9 @@ namespace Contacts.Base.Repository
         /// Gets the next identifier.
         /// </summary>
         /// <returns>Return de next identifier.</returns>
-        public long GetNextId()
+        public string GetNextId()
         {
-            if(_context.Set<T>().Count() > 0)
-            {
-                return _context.Set<T>().Max(x => x.Id) + 1;
-            }
-            else
-            {
-                return 1;
-            }
+            return Guid.NewGuid().ToString();
         }
     }
 }

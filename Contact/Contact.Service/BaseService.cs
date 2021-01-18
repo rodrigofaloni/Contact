@@ -45,7 +45,7 @@ namespace Contacts.Base.Service
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Return the entity.</returns>
-        public T GetById(long id) => BaseRepository.GetById(id);
+        public T GetById(string id) => BaseRepository.GetById(id);
 
         /// <summary>
         /// Insert the specified entidade.
@@ -90,7 +90,7 @@ namespace Contacts.Base.Service
         /// Gets the next identifier.
         /// </summary>
         /// <returns>Return de next identifier.</returns>
-        public long GetNextId()
+        public string GetNextId()
         {
             return this.BaseRepository.GetNextId();
         }
