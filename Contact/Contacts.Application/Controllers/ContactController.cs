@@ -12,16 +12,35 @@ using System.Net;
 
 namespace Contacts.Application.Controllers
 {
+    /// <summary>
+    /// Controller responsible for crud contacts.
+    /// </summary>
     public class ContactController : Controller
     {
-        protected readonly IContactService _servico;
+        #region Properties
+        /// <summary>
+        /// The contact service.
+        /// </summary>
+        protected readonly IContactService _contactService;
+        #endregion
 
-        public ContactController(IContactService servico)
+        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContactController"/> class.
+        /// </summary>
+        /// <param name="contactService">The contact service.</param>
+        public ContactController(IContactService contactService)
         {
-            _servico = servico;
+            _contactService = contactService;
         }
+        #endregion
 
-        // GET: Employee
+        #region Public Methods
+        /// <summary>
+        /// Get the index page of contacts.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <returns>Return the index page.</returns>
         public IActionResult Index(string message)
         {
             try
@@ -31,19 +50,8 @@ namespace Contacts.Application.Controllers
                     ViewBag.SucessMessage = message;
                 }
 
-                var listItens = _servico.ListContacts();
-
-                var listVwm = listItens.Select(u => new ContactVWM
-                {
-                    Id = u.Id,
-                    Type = u.Person.Type,
-                    NameExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Name : u.Person.LegalPerson.CompanyName,
-                    DocumentExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Cpf : u.Person.LegalPerson.Cnpj,
-                    ZipCode = u.Person.Address.ZipCode,
-                    Country = u.Person.Address.Country,
-                });
-
-                return View(listVwm);
+                IEnumerable<ContactVWM> listContactVwm = GetContacsVwm();
+                return View(listContactVwm);
             }
             catch (Exception erro)
             {
@@ -51,22 +59,17 @@ namespace Contacts.Application.Controllers
             }
         }
 
+        /// <summary>
+        /// Get the AddorEdit page of contacts.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>The page.</returns>
         [HttpGet]
         public IActionResult AddOrEdit(string id)
         {
             try
             {
-                var types = new List<EnumTypePerson>();
-                types.Add(EnumTypePerson.NATURAL);
-                types.Add(EnumTypePerson.LEGAL);
-                ViewBag.Types = types;
-
-                var genders = new List<EnumGender>();
-                genders.Add(EnumGender.MALE);
-                genders.Add(EnumGender.FEMALE);
-                ViewBag.Genders = genders;
-
-                ViewBag.Countries = HelperCountry.GetAllCountries();
+                PrepareViewBags();
 
                 if (string.IsNullOrEmpty(id))
                 {
@@ -74,33 +77,10 @@ namespace Contacts.Application.Controllers
                 }
                 else
                 {
-                    var dataBaseEntity = _servico.GetContact(id);
+                    var dataBaseEntity = _contactService.GetContact(id);
+                    ContactVWM contactVwm = ModelToVwm(dataBaseEntity);
 
-                    var vwm = new ContactVWM { Id = dataBaseEntity.Id };
-                    vwm.Type = dataBaseEntity.Person.Type;
-
-                    if (dataBaseEntity.Person.Type == EnumTypePerson.NATURAL)
-                    {
-                        vwm.Name = dataBaseEntity.Person.NaturalPerson.Name;
-                        vwm.Birthday = dataBaseEntity.Person.NaturalPerson.Birthday;
-                        vwm.Gender = dataBaseEntity.Person.NaturalPerson.Gender;
-                        vwm.Cpf = dataBaseEntity.Person.NaturalPerson.Cpf;
-                    }
-                    else
-                    {
-                        vwm.CompanyName = dataBaseEntity.Person.LegalPerson.CompanyName;
-                        vwm.TradeName = dataBaseEntity.Person.LegalPerson.TradeName;
-                        vwm.Cnpj = dataBaseEntity.Person.LegalPerson.Cnpj;
-                    }
-
-                    vwm.ZipCode = dataBaseEntity.Person.Address.ZipCode;
-                    vwm.Country = dataBaseEntity.Person.Address.Country;
-                    vwm.State = dataBaseEntity.Person.Address.State;
-                    vwm.City = dataBaseEntity.Person.Address.City;
-                    vwm.AddressLine1 = dataBaseEntity.Person.Address.AddressLine1;
-                    vwm.AddressLine2 = dataBaseEntity.Person.Address.AddressLine2;
-
-                    return View(vwm);
+                    return View(contactVwm);
                 }
             }
             catch (Exception erro)
@@ -109,107 +89,31 @@ namespace Contacts.Application.Controllers
             }
         }
 
+        /// <summary>
+        /// Adds the or edit contacts.
+        /// </summary>
+        /// <param name="contact">The contact.</param>
+        /// <returns>Return the result of operation.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddOrEdit(ContactVWM contact)
         {
             try
             {
-                var nextId = _servico.GetNextId();
-
                 if (string.IsNullOrEmpty(contact.Id))
                 {
-                    ContactValidator validator = new ContactValidator(_servico);
+                    ContactValidator validator = new ContactValidator(_contactService);
                     validator.InsertValidator(contact);
-                    Contact newContact = new Contact { Id = nextId };
-                    var person = new Person
-                    {
-                        Id = nextId,
-                        Type = contact.Type,
-                        Address = new Address
-                        {
-                            Id = nextId,
-                            ZipCode = contact.ZipCode,
-                            City = contact.City,
-                            State = contact.State,
-                            AddressLine1 = contact.AddressLine1,
-                            AddressLine2 = contact.AddressLine2,
-                            Country = contact.Country,
-                        }
-                    };
-
-                    newContact.Person = person;
-
-                    if (contact.Type == EnumTypePerson.NATURAL)
-                    {
-                        newContact.Person.NaturalPerson = new NaturalPerson
-                        {
-                            Id = nextId,
-                            Birthday = contact.Birthday.Value,
-                            Cpf = contact.Cpf.Replace(".", string.Empty).Replace("-", string.Empty),
-                            Gender = contact.Gender.Value,
-                            Name = contact.Name
-                        };
-                    }
-                    else
-                    {
-                        newContact.Person.LegalPerson = new LegalPerson
-                        {
-                            Id = nextId,
-                            Cnpj = contact.Cnpj.Replace(".", string.Empty).Replace("-", string.Empty).Replace("/", string.Empty),
-                            CompanyName = contact.CompanyName,
-                            TradeName = contact.TradeName
-                        };
-                    }
-
-                    _servico.Insert(newContact);
+                    Contact newContact = PrepareNewContact(contact);
+                    _contactService.Insert(newContact);
                 }
                 else
                 {
-                    ContactValidator validator = new ContactValidator(_servico);
+                    ContactValidator validator = new ContactValidator(_contactService);
                     validator.UpdateValidator(contact);
-                    var dataBaseEntity = _servico.GetContact(contact.Id);
-                    dataBaseEntity.Person.Type = contact.Type;
-                    dataBaseEntity.Person.Address.ZipCode = contact.ZipCode;
-                    dataBaseEntity.Person.Address.City = contact.City;
-                    dataBaseEntity.Person.Address.State = contact.State;
-                    dataBaseEntity.Person.Address.Country = contact.Country;
-                    dataBaseEntity.Person.Address.AddressLine1 = contact.AddressLine1;
-                    dataBaseEntity.Person.Address.AddressLine2 = contact.AddressLine2;
-
-                    if (contact.Type == EnumTypePerson.NATURAL)
-                    {
-                        if (dataBaseEntity.Person.NaturalPerson == null)
-                        {
-                            dataBaseEntity.Person.NaturalPerson = new NaturalPerson
-                            {
-                                Id = nextId,
-                            };
-                            dataBaseEntity.Person.LegalPerson = null;
-                        }
-
-                        dataBaseEntity.Person.NaturalPerson.Birthday = contact.Birthday.Value;
-                        dataBaseEntity.Person.NaturalPerson.Cpf = contact.Cpf;
-                        dataBaseEntity.Person.NaturalPerson.Gender = contact.Gender.Value;
-                        dataBaseEntity.Person.NaturalPerson.Name = contact.Name;
-                    }
-                    else
-                    {
-                        if (dataBaseEntity.Person.LegalPerson == null)
-                        {
-                            dataBaseEntity.Person.LegalPerson = new LegalPerson
-                            {
-                                Id = nextId,
-                            };
-                            dataBaseEntity.Person.NaturalPerson = null;
-                        }
-
-                        dataBaseEntity.Person.LegalPerson.Cnpj = contact.Cnpj;
-                        dataBaseEntity.Person.LegalPerson.CompanyName = contact.CompanyName;
-                        dataBaseEntity.Person.LegalPerson.TradeName = contact.TradeName;
-                    }
-
-                    _servico.Update(dataBaseEntity);
+                    var dataBaseEntity = _contactService.GetContact(contact.Id);
+                    PrepareUpdateContact(contact, dataBaseEntity);
+                    _contactService.Update(dataBaseEntity);
                 }
 
                 return Json(true);
@@ -220,20 +124,196 @@ namespace Contacts.Application.Controllers
             }
         }
 
-
-        // GET: Employee/Delete/5
+        /// <summary>
+        /// Deletes the specified identifier.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the result of operation.</returns>
         public IActionResult Delete(string id)
         {
             try
             {
-                var employee = _servico.GetById(id);
-                _servico.Remove(employee);
-                return RedirectToAction(nameof(Index));
+                var employee = _contactService.GetById(id);
+                _contactService.Remove(employee);
+                return RedirectToAction(nameof(Index), new { message = "Record removed successfully!" });
             }
             catch (Exception erro)
             {
                 return Json(new ValidateMessage { Message = erro.Message, IsError = true });
             }
         }
+        #endregion
+
+        #region Private Methods
+        /// <summary>
+        /// Responsible to convert Models to VWM.
+        /// </summary>
+        /// <param name="dataBaseEntity">The data base entity.</param>
+        /// <returns>Return the entity vwm.</returns>
+        private static ContactVWM ModelToVwm(Contact dataBaseEntity)
+        {
+            var contactVwm = new ContactVWM { Id = dataBaseEntity.Id };
+            contactVwm.Type = dataBaseEntity.Person.Type;
+
+            if (dataBaseEntity.Person.Type == EnumTypePerson.NATURAL)
+            {
+                contactVwm.Name = dataBaseEntity.Person.NaturalPerson.Name;
+                contactVwm.Birthday = dataBaseEntity.Person.NaturalPerson.Birthday;
+                contactVwm.Gender = dataBaseEntity.Person.NaturalPerson.Gender;
+                contactVwm.Cpf = dataBaseEntity.Person.NaturalPerson.Cpf;
+            }
+            else
+            {
+                contactVwm.CompanyName = dataBaseEntity.Person.LegalPerson.CompanyName;
+                contactVwm.TradeName = dataBaseEntity.Person.LegalPerson.TradeName;
+                contactVwm.Cnpj = dataBaseEntity.Person.LegalPerson.Cnpj;
+            }
+
+            contactVwm.ZipCode = dataBaseEntity.Person.Address.ZipCode;
+            contactVwm.Country = dataBaseEntity.Person.Address.Country;
+            contactVwm.State = dataBaseEntity.Person.Address.State;
+            contactVwm.City = dataBaseEntity.Person.Address.City;
+            contactVwm.AddressLine1 = dataBaseEntity.Person.Address.AddressLine1;
+            contactVwm.AddressLine2 = dataBaseEntity.Person.Address.AddressLine2;
+            return contactVwm;
+        }
+
+        /// <summary>
+        /// Gets the contacs VWM.
+        /// </summary>
+        /// <returns>Return the contacts.</returns>
+        private IEnumerable<ContactVWM> GetContacsVwm()
+        {
+            var listContacts = _contactService.ListContacts();
+
+            var listContactVwm = listContacts.Select(u => new ContactVWM
+            {
+                Id = u.Id,
+                Type = u.Person.Type,
+                NameExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Name : u.Person.LegalPerson.CompanyName,
+                DocumentExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Cpf : u.Person.LegalPerson.Cnpj,
+                ZipCode = u.Person.Address.ZipCode,
+            });
+            return listContactVwm;
+        }
+
+        /// <summary>
+        /// Prepares the update contact.
+        /// </summary>
+        /// <param name="contact">The contact.</param>
+        /// <param name="dataBaseEntity">The data base entity.</param>
+        private void PrepareUpdateContact(ContactVWM contact, Contact dataBaseEntity)
+        {
+            dataBaseEntity.Person.Type = contact.Type;
+            dataBaseEntity.Person.Address.ZipCode = contact.ZipCode;
+            dataBaseEntity.Person.Address.City = contact.City;
+            dataBaseEntity.Person.Address.State = contact.State;
+            dataBaseEntity.Person.Address.Country = contact.Country;
+            dataBaseEntity.Person.Address.AddressLine1 = contact.AddressLine1;
+            dataBaseEntity.Person.Address.AddressLine2 = contact.AddressLine2;
+
+            if (contact.Type == EnumTypePerson.NATURAL)
+            {
+                if (dataBaseEntity.Person.NaturalPerson == null)
+                {
+                    dataBaseEntity.Person.NaturalPerson = new NaturalPerson
+                    {
+                        Id = _contactService.GetNextId(),
+                    };
+                    dataBaseEntity.Person.LegalPerson = null;
+                }
+
+                dataBaseEntity.Person.NaturalPerson.Birthday = contact.Birthday.Value;
+                dataBaseEntity.Person.NaturalPerson.Cpf = contact.Cpf;
+                dataBaseEntity.Person.NaturalPerson.Gender = contact.Gender.Value;
+                dataBaseEntity.Person.NaturalPerson.Name = contact.Name;
+            }
+            else
+            {
+                if (dataBaseEntity.Person.LegalPerson == null)
+                {
+                    dataBaseEntity.Person.LegalPerson = new LegalPerson
+                    {
+                        Id = _contactService.GetNextId(),
+                    };
+                    dataBaseEntity.Person.NaturalPerson = null;
+                }
+
+                dataBaseEntity.Person.LegalPerson.Cnpj = contact.Cnpj;
+                dataBaseEntity.Person.LegalPerson.CompanyName = contact.CompanyName;
+                dataBaseEntity.Person.LegalPerson.TradeName = contact.TradeName;
+            }
+        }
+
+        /// <summary>
+        /// Prepares the new contact.
+        /// </summary>
+        /// <param name="contact">The contact.</param>
+        /// <returns>Return the new contact.</returns>
+        private Contact PrepareNewContact(ContactVWM contact)
+        {
+            Contact newContact = new Contact { Id = _contactService.GetNextId() };
+            var person = new Person
+            {
+                Id = _contactService.GetNextId(),
+                Type = contact.Type,
+                Address = new Address
+                {
+                    Id = _contactService.GetNextId(),
+                    ZipCode = contact.ZipCode,
+                    City = contact.City,
+                    State = contact.State,
+                    AddressLine1 = contact.AddressLine1,
+                    AddressLine2 = contact.AddressLine2,
+                    Country = contact.Country,
+                }
+            };
+
+            newContact.Person = person;
+
+            if (contact.Type == EnumTypePerson.NATURAL)
+            {
+                newContact.Person.NaturalPerson = new NaturalPerson
+                {
+                    Id = _contactService.GetNextId(),
+                    Birthday = contact.Birthday.Value,
+                    Cpf = contact.Cpf.Replace(".", string.Empty).Replace("-", string.Empty),
+                    Gender = contact.Gender.Value,
+                    Name = contact.Name
+                };
+            }
+            else
+            {
+                newContact.Person.LegalPerson = new LegalPerson
+                {
+                    Id = _contactService.GetNextId(),
+                    Cnpj = contact.Cnpj.Replace(".", string.Empty).Replace("-", string.Empty).Replace("/", string.Empty),
+                    CompanyName = contact.CompanyName,
+                    TradeName = contact.TradeName
+                };
+            }
+
+            return newContact;
+        }
+
+        /// <summary>
+        /// Prepares the view bags.
+        /// </summary>
+        private void PrepareViewBags()
+        {
+            var types = new List<EnumTypePerson>();
+            types.Add(EnumTypePerson.NATURAL);
+            types.Add(EnumTypePerson.LEGAL);
+            ViewBag.Types = types;
+
+            var genders = new List<EnumGender>();
+            genders.Add(EnumGender.MALE);
+            genders.Add(EnumGender.FEMALE);
+            ViewBag.Genders = genders;
+
+            ViewBag.Countries = HelperCountry.GetAllCountries();
+        }
+
+        #endregion
     }
 }

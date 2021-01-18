@@ -1,12 +1,12 @@
 ﻿namespace Contacts.Base.Entity
 {
     /// <summary>
-    /// Base entity class.
+    /// Class that implements the base entity.
     /// </summary>
     public class BaseEntity
     {
         /// <summary>
-        /// Recupera ou define o id.
+        /// Gets or sets the identifier.
         /// </summary>
         public virtual string Id { get; set; }
     }

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace Contacts.Domain.Enumerator
 {
+    /// <summary>
+    /// Enumerator that defines the type person.
+    /// </summary>
     public enum EnumTypePerson
     {
         /// <summary>

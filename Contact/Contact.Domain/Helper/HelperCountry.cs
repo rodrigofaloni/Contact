@@ -1,11 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Contacts.Domain.Helper
 {
+    /// <summary>
+    /// Helper temporary to define a instance copy of countries.
+    /// </summary>
     public static class HelperCountry
     {
+        /// <summary>
+        /// Gets all countries.
+        /// </summary>
+        /// <returns>Return all countries.</returns>
         public static Array GetAllCountries()
         {
             return new[]{

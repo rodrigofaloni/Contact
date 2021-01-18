@@ -26,11 +26,24 @@ namespace Contacts.Service
             this.contactRepository = contactRepository;
         }
 
+        /// <summary>
+        /// Lists the contacts.
+        /// </summary>
+        /// <returns>
+        /// Return the list of contacts.
+        /// </returns>
         public IList<Contact> ListContacts()
         {
             return this.contactRepository.ListContacts();
         }
 
+        /// <summary>
+        /// Gets the contact.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>
+        /// Return the contact.
+        /// </returns>
         public Contact GetContact(string id)
         {
             return this.contactRepository.GetContact(id);

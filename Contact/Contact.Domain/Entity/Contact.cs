@@ -1,8 +1,4 @@
 ﻿using Contacts.Base.Entity;
-using Contacts.Domain.Enumerator;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Contacts.Domain.Entity
 {
@@ -11,6 +7,9 @@ namespace Contacts.Domain.Entity
     /// </summary>
     public class Contact : BaseEntity
     {
+        /// <summary>
+        /// Gets or sets the person.
+        /// </summary>
         public Person Person { get; set; }
     }
 }

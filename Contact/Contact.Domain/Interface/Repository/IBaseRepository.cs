@@ -4,19 +4,41 @@ using System.Linq;
 namespace Contacts.Base.Interface
 {
     /// <summary>
-    /// Class for a base repository.
+    /// Interface that implements a base repository.
     /// </summary>
     public interface IBaseRepository<T> where T : BaseEntity
     {
-        T Insert(T entidade);
+        /// <summary>
+        /// Inserts the specified entidade.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns>Return the entity.</returns>
+        T Insert(T entity);
 
+        /// <summary>
+        /// Gets the by identifier.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the entity.</returns>
         T GetById(string id);
 
+        /// <summary>
+        /// Lists this instance.
+        /// </summary>
+        /// <returns>Return the instances.</returns>
         IQueryable<T> List();
 
-        void Update(T entidade);
+        /// <summary>
+        /// Updates the specified entidade.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        void Update(T entity);
 
-        void Remove(T entidade);
+        /// <summary>
+        /// Removes the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        void Remove(T entity);
 
         /// <summary>
         /// Gets the next identifier.

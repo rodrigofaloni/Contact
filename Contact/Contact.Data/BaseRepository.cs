@@ -12,11 +12,16 @@ namespace Contacts.Base.Repository
     /// </summary>
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
+        #region Variables
+
         /// <summary>
         /// The context.
         /// </summary>
         protected readonly BaseContext _context;
 
+        #endregion
+
+        #region Constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRepository{T}"/> class.
         /// </summary>
@@ -27,11 +32,14 @@ namespace Contacts.Base.Repository
             this._context = context;
         }
 
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Inserts the specified entidade.
         /// </summary>
-        /// <param name="entidade">The entity.</param>
+        /// <param name="entity">The entity.</param>
         /// <returns>Return the entity.</returns>
         public T Insert(T entity)
         {
@@ -53,7 +61,7 @@ namespace Contacts.Base.Repository
         /// <summary>
         /// Updates the specified entidade.
         /// </summary>
-        /// <param name="entidade">The entity.</param>
+        /// <param name="entity">The entity.</param>
         public void Update(T entity)
         {
             _context.Entry(entity).State = EntityState.Modified;
@@ -89,5 +97,7 @@ namespace Contacts.Base.Repository
         {
             return Guid.NewGuid().ToString();
         }
+
+        #endregion
     }
 }

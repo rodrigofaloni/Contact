@@ -1,8 +1,6 @@
 ﻿using Contacts.Base.Interface;
 using Contacts.Domain.Entity;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Contacts.Domain.Interface.Service
 {
@@ -11,8 +9,17 @@ namespace Contacts.Domain.Interface.Service
     /// </summary>
     public interface IContactService : IBaseService<Contact>
     {
+        /// <summary>
+        /// Lists the contacts.
+        /// </summary>
+        /// <returns>Return the list of contacts.</returns>
         IList<Contact> ListContacts();
 
+        /// <summary>
+        /// Gets the contact.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Return the contact.</returns>
         Contact GetContact(string id);
     }
 }

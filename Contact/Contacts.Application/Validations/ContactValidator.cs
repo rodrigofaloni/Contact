@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Contacts.Application.Validations
 {
     /// <summary>
-    /// 
+    /// Class responsible for validations of contact.
     /// </summary>
     public class ContactValidator
     {
@@ -25,17 +25,29 @@ namespace Contacts.Application.Validations
         {
             _contactService = contactService;
         }
-      
+
+        /// <summary>
+        /// Respnsable for update validation.
+        /// </summary>
+        /// <param name="contact">The contact.</param>
         public void UpdateValidator(ContactVWM contact)
         {
             GeneralValidation(contact);
         }
-      
+
+        /// <summary>
+        /// Respnsable for insert validation.
+        /// </summary>
+        /// <param name="contact">The contact.</param>
         public void InsertValidator(ContactVWM contact)
         {
             GeneralValidation(contact);
         }
 
+        /// <summary>
+        /// Respnsable for Generals validation.
+        /// </summary>
+        /// <param name="contact">The contact.</param>
         private void GeneralValidation(ContactVWM contact)
         {
             if (contact == null)

@@ -10,6 +10,8 @@ namespace Contacts.Base.Service
     /// </summary>
     public class BaseService<T> : IBaseService<T> where T : BaseEntity
     {
+        #region Properties
+
         /// <summary>
         /// Gets or sets the base repository.
         /// </summary>
@@ -23,6 +25,9 @@ namespace Contacts.Base.Service
         /// </summary>
         private bool disposed = false;
 
+        #endregion
+
+        #region Constructor and destructor
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseService{T}"/> class.
         /// </summary>
@@ -39,7 +44,9 @@ namespace Contacts.Base.Service
         {
             this.Dispose(false);
         }
+        #endregion
 
+        #region Public Methods
         /// <summary>
         /// Gets the by identifier.
         /// </summary>
@@ -54,30 +61,6 @@ namespace Contacts.Base.Service
         public void Insert(T entity) => InternalInsert(entity);
 
         /// <summary>
-        /// Internals the insert.
-        /// </summary>
-        /// <param name="entidade">The entity.</param>
-        protected virtual void InternalInsert(T entity)
-        {
-            this.BaseRepository.Insert(entity);
-        }
-
-        /// <summary>
-        /// Update the specified entity.
-        /// </summary>
-        /// <param name="entidade">The entity.</param>
-        public void Update(T entity) => InternalUpdate(entity);
-
-        /// <summary>
-        /// Internals the update.
-        /// </summary>
-        /// <param name="entidade">The entity.</param>
-        protected virtual void InternalUpdate(T entity)
-        {
-            this.BaseRepository.Update(entity);
-        }
-
-        /// <summary>
         /// Removers the specified entidade.
         /// </summary>
         /// <param name="entity">The entity.</param>
@@ -85,6 +68,12 @@ namespace Contacts.Base.Service
         {
             this.InternalRemove(entity);
         }
+
+        /// <summary>
+        /// Update the specified entity.
+        /// </summary>
+        /// <param name="entidade">The entity.</param>
+        public void Update(T entity) => InternalUpdate(entity);
 
         /// <summary>
         /// Gets the next identifier.
@@ -96,18 +85,11 @@ namespace Contacts.Base.Service
         }
 
         /// <summary>
-        /// Internals the remove.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        protected virtual void InternalRemove(T entity)
-        {
-            this.BaseRepository.Remove(entity);
-        }
-
-        /// <summary>
         /// Lists this instance.
         /// </summary>
-        /// <returns>The instances.</returns>
+        /// <returns>
+        /// Return the instance.
+        /// </returns>
         public IQueryable<T> List() => BaseRepository.List();
 
         /// <summary>
@@ -119,18 +101,53 @@ namespace Contacts.Base.Service
             GC.SuppressFinalize(this);
         }
 
+        #endregion
+
+        #region Protected methods
+
+        /// <summary>
+        /// Internals the insert.
+        /// </summary>
+        /// <param name="entidade">The entity.</param>
+        protected virtual void InternalInsert(T entity)
+        {
+            this.BaseRepository.Insert(entity);
+        }
+
+        /// <summary>
+        /// Internals the update.
+        /// </summary>
+        /// <param name="entidade">The entity.</param>
+        protected virtual void InternalUpdate(T entity)
+        {
+            this.BaseRepository.Update(entity);
+        }
+
+        /// <summary>
+        /// Internals the remove.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        protected virtual void InternalRemove(T entity)
+        {
+            this.BaseRepository.Remove(entity);
+        }
+
+        #endregion
+
+        #region Private methods
+
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         private void Dispose(bool disposing)
         {
-            //// Verify if disposed have been call.
             if (!this.disposed && disposing)
             {
-                //// Set the validation variable to true.
                 this.disposed = true;
             }
         }
+
+        #endregion
     }
 }
