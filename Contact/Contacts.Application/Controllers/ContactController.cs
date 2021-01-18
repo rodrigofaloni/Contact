@@ -129,13 +129,14 @@ namespace Contacts.Application.Controllers
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Return the result of operation.</returns>
+        [HttpPost]
         public IActionResult Delete(string id)
         {
             try
             {
                 var employee = _contactService.GetById(id);
                 _contactService.Remove(employee);
-                return RedirectToAction(nameof(Index), new { message = "Record removed successfully!" });
+                return Json(true);
             }
             catch (Exception erro)
             {

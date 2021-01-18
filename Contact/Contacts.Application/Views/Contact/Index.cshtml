@@ -45,7 +45,7 @@
                 </td>
                 <td>
                     <a asp-action="AddOrEdit" asp-route-id="@item.Id"><i class="fa fa-marker fa-lg"></i></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-danger ml-1" onclick="return confirm('Are you sure to delete this record?')"><i class="fa fa-trash-alt fa-lg"></i></a>
+                    <a  href="javascript:;" class="text-danger ml-1" onclick="confirmRemoveClick('@item.Id')"><i class="fa fa-trash-alt fa-lg"></i></a>
                 </td>
             </tr>
         }
@@ -59,6 +59,37 @@
            $(document).ready(function () {
              showSucess('@ViewBag.SucessMessage');
            });
+
+     function confirmRemoveClick(id)
+     {
+         if (confirm('Are you sure to delete this record?')) {
+             deleteRecord(id);
+         }
+     }
+
+    function deleteRecord(id)
+    {
+        $.ajax({
+            url: '@Url.Action("Delete", "Contact")',
+            data: { 'id': id },
+            dataType: 'json',
+            type: 'POST',
+            success: function (response)
+            {
+                if (response.isError) {
+                    showError(response.message);
+                }
+                else {
+                       var url = '@Url.Action("Index", "Contact",  new { message = "Record removed successfully!" } )';
+                       window.location.href = url;
+                }
+            },
+            error: function (response)
+            {
+                showError(response.Message);
+            }
+        });
+    }
         </script>
     }
 }
