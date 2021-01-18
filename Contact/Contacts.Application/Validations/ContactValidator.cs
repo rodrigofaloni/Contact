@@ -1,4 +1,5 @@
 ﻿using Contacts.Application.Models;
+using Contacts.Domain.Helper;
 using Contacts.Domain.Interface.Service;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace Contacts.Application.Validations
         }
 
         /// <summary>
-        /// Respnsable for update validation.
+        /// Responsable for update validation.
         /// </summary>
         /// <param name="contact">The contact.</param>
         public void UpdateValidator(ContactVWM contact)
@@ -36,7 +37,7 @@ namespace Contacts.Application.Validations
         }
 
         /// <summary>
-        /// Respnsable for insert validation.
+        /// Responsable for insert validation.
         /// </summary>
         /// <param name="contact">The contact.</param>
         public void InsertValidator(ContactVWM contact)
@@ -45,7 +46,7 @@ namespace Contacts.Application.Validations
         }
 
         /// <summary>
-        /// Respnsable for Generals validation.
+        /// Responsable for Generals validation.
         /// </summary>
         /// <param name="contact">The contact.</param>
         private void GeneralValidation(ContactVWM contact)
@@ -55,7 +56,7 @@ namespace Contacts.Application.Validations
                 throw new Exception("Incorret object.");
             }
 
-            if(contact.Type == Domain.Enumerator.EnumTypePerson.NATURAL)
+            if (contact.Type == Domain.Enumerator.EnumTypePerson.NATURAL)
             {
                 if (string.IsNullOrEmpty(contact.Name))
                 {
@@ -70,6 +71,13 @@ namespace Contacts.Application.Validations
                 if (string.IsNullOrEmpty(contact.Cpf))
                 {
                     throw new Exception("The field Cpf is required.");
+                }
+                else
+                {
+                    if (!ValidationHelper.CpfValidatior(contact.Cpf.Replace(".", string.Empty).Replace("-", string.Empty)))
+                    {
+                        throw new Exception("The CPF informed is invalid.");
+                    }
                 }
 
                 if (!contact.Birthday.HasValue)
@@ -93,8 +101,24 @@ namespace Contacts.Application.Validations
                 {
                     throw new Exception("The field cnpj is required.");
                 }
+                else
+                {
+                    if (!ValidationHelper.CnpjValidator(contact.Cnpj.Replace(".", string.Empty).Replace("-", string.Empty)))
+                    {
+                        throw new Exception("The CNPJ informed is invalid.");
+                    }
+                }
             }
 
+            AddressValidation(contact);
+        }
+
+        /// <summary>
+        /// Responsable for address validation.
+        /// </summary>
+        /// <param name="contact">The contact.</param>
+        private static void AddressValidation(ContactVWM contact)
+        {
             if (string.IsNullOrEmpty(contact.ZipCode))
             {
                 throw new Exception("The field Zip Code is required.");

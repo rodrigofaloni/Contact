@@ -277,7 +277,7 @@ namespace Contacts.Application.Controllers
                 {
                     Id = _contactService.GetNextId(),
                     Birthday = contact.Birthday.Value,
-                    Cpf = contact.Cpf.Replace(".", string.Empty).Replace("-", string.Empty),
+                    Cpf = contact.Cpf,
                     Gender = contact.Gender.Value,
                     Name = contact.Name
                 };
@@ -287,7 +287,7 @@ namespace Contacts.Application.Controllers
                 newContact.Person.LegalPerson = new LegalPerson
                 {
                     Id = _contactService.GetNextId(),
-                    Cnpj = contact.Cnpj.Replace(".", string.Empty).Replace("-", string.Empty).Replace("/", string.Empty),
+                    Cnpj = contact.Cnpj,
                     CompanyName = contact.CompanyName,
                     TradeName = contact.TradeName
                 };
@@ -311,7 +311,7 @@ namespace Contacts.Application.Controllers
             genders.Add(EnumGender.FEMALE);
             ViewBag.Genders = genders;
 
-            ViewBag.Countries = HelperCountry.GetAllCountries();
+            ViewBag.Countries = CountryHelper.GetAllCountries();
         }
 
         #endregion

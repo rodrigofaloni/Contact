@@ -5,7 +5,7 @@ namespace Contacts.Domain.Helper
     /// <summary>
     /// Helper temporary to define a instance copy of countries.
     /// </summary>
-    public static class HelperCountry
+    public static class CountryHelper
     {
         /// <summary>
         /// Gets all countries.

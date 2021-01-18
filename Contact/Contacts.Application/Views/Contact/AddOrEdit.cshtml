@@ -19,7 +19,7 @@
             <div id="divNaturalPerson">
                 <div class="form-group">
                     <label class="control-label">Name*</label>
-                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control",  @maxlength="200" })
                 </div>
 
                 <div class="form-group">
@@ -42,12 +42,12 @@
             <div id="divLegalPerson">
                 <div class="form-group">
                     <label class="control-label">Company Name*</label>
-                    @Html.TextBoxFor(x => x.CompanyName, new { @class = "form-control" })
+                    @Html.TextBoxFor(x => x.CompanyName, new { @class = "form-control",  @maxlength="200" })
                 </div>
 
                 <div class="form-group">
                     <label class="control-label">Trade Name*</label>
-                    @Html.TextBoxFor(x => x.TradeName, new { @class = "form-control" })
+                    @Html.TextBoxFor(x => x.TradeName, new { @class = "form-control",  @maxlength="200" })
                 </div>
 
                 <div class="form-group">
@@ -73,22 +73,22 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label class="control-label">State*</label>
-                    @Html.TextBoxFor(x => x.State, new { @class = "form-control" })
+                    @Html.TextBoxFor(x => x.State, new { @class = "form-control",  @maxlength="200" })
                 </div>
                 <div class="form-group col-md-6">
                     <label class="control-label">City*</label>
-                    @Html.TextBoxFor(x => x.City, new { @class = "form-control" })
+                    @Html.TextBoxFor(x => x.City, new { @class = "form-control",  @maxlength="200" })
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="control-label">AddressLine1</label>
-                @Html.TextBoxFor(x => x.AddressLine1, new { @class = "form-control" })
+                @Html.TextBoxFor(x => x.AddressLine1, new { @class = "form-control",  @maxlength="200" })
             </div>
 
             <div class="form-group">
                 <label class="control-label">AddressLine2</label>
-                @Html.TextBoxFor(x => x.AddressLine2, new { @class = "form-control" })
+                @Html.TextBoxFor(x => x.AddressLine2, new { @class = "form-control",  @maxlength="200" })
             </div>
           
             <div class="form-row">
@@ -107,7 +107,7 @@
     <script>
         $(document).ready(function () {
             $("#Birthday").mask("99/99/9999");
-            $("#ZipCode").mask("036273-999");
+            $("#ZipCode").mask("99999-999");
             $("#Cpf").mask("999.999.999-99");
             $("#Cnpj").mask("99.999.999/9999-99");
             callChangefunc('@Model.Type', null);
@@ -126,7 +126,6 @@
 
     function btnSaveClick()
     {
-
         $.ajax({
             url: '@Url.Action("AddOrEdit", "Contact")',
             data: $($("#formEdit")).serializeArray(),
@@ -134,7 +133,6 @@
             type: 'POST',
             success: function (response)
             {
-                debugger;
                 if (response.isError) {
                     showError(response.message);
                 }
