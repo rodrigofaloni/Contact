@@ -1,0 +1,187 @@
+﻿@model Contacts.Application.Models.ContactVWM
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>Contact Form</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form id="formEdit" asp-action="AddOrEdit">
+
+            @Html.HiddenFor(x => x.Id)
+            <div class="form-group">
+                <label class="control-label">Type</label>
+                @Html.DropDownListFor(model => model.Type, new SelectList(ViewBag.Types), new { @class = "form-control", @onchange = "callChangefunc(this.value)" })
+            </div>
+
+            <div id="divNaturalPerson">
+                <div class="form-group">
+                    <label class="control-label">Name</label>
+                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Gender</label>
+                    @Html.DropDownListFor(model => model.Gender, new SelectList(ViewBag.Genders), new { @class = "form-control" })
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label class="control-label">CPF</label>
+                        @Html.TextBoxFor(x => x.Cpf, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="control-label">Birthday</label>
+                        @Html.TextBoxFor(x => x.Birthday, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+
+            <div id="divLegalPerson">
+                <div class="form-group">
+                    <label class="control-label">Company Name</label>
+                    @Html.TextBoxFor(x => x.CompanyName, new { @class = "form-control" })
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Trade Name</label>
+                    @Html.TextBoxFor(x => x.TradeName, new { @class = "form-control" })
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Cnpj</label>
+                    @Html.TextBoxFor(x => x.Cnpj, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label class="control-label">ZipCode</label>
+                    @Html.TextBoxFor(x => x.ZipCode, new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="control-label">Country</label>
+                    @Html.DropDownListFor(x => x.Country, new SelectList(
+                                   ViewBag.Countries,
+                                     "Value",
+                                     "Text"), new { @class = "form-control" })
+                    @*@Html.TextBoxFor(x => x.Country, new { @class = "form-control" })*@
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label class="control-label">State</label>
+                    @Html.TextBoxFor(x => x.State, new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="control-label">City</label>
+                    @Html.TextBoxFor(x => x.City, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">AddressLine1</label>
+                @Html.TextBoxFor(x => x.AddressLine1, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">AddressLine2</label>
+                @Html.TextBoxFor(x => x.AddressLine2, new { @class = "form-control" })
+            </div>
+
+            @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="EmployeeId" />
+                <div class="form-group">
+                    <label asp-for="FullName" class="control-label"></label>
+                    <input asp-for="FullName" class="form-control" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="EmpCode" class="control-label"></label>
+                        <input asp-for="EmpCode" class="form-control" />
+                        <span asp-validation-for="EmpCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Position" class="control-label"></label>
+                        <input asp-for="Position" class="form-control" />
+                        <span asp-validation-for="Position" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="OfficeLocation" class="control-label"></label>
+                    <input asp-for="OfficeLocation" class="form-control" />
+                    <span asp-validation-for="OfficeLocation" class="text-danger"></span>
+                </div>*@
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <a href="javascript:;" class="btn btn-primary btn-block" onclick="btnSaveClick()"><i class="fa fa-save"></i> Submit</a>
+                </div>
+                <div class="form-group col-md-6">
+                    <a asp-action="Index" class="btn btn-secondary btn-block"><i class="fa fa-table"></i> Back to List</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+   
+        $(document).ready(function () {
+            $("#Birthday").mask("99/99/9999");
+            $("#ZipCode").mask("036273-999");
+            $("#Cpf").mask("999.999.999-99");
+            $("#Cnpj").mask("99.999.999/9999-99");
+
+            callChangefunc('@Model.Type');
+        });
+
+        function callChangefunc(val) {
+            if (val == '@Contacts.Domain.Enumerator.EnumTypePerson.LEGAL') {
+                $("#divLegalPerson").show('slow');
+                $("#divNaturalPerson").hide('slow');
+            }
+            else {
+                $("#divNaturalPerson").show('slow');
+                $("#divLegalPerson").hide('slow');
+            }
+        }
+
+    function btnSaveClick()
+    {
+
+        $.ajax({
+            url: '@Url.Action("AddOrEdit", "Contact")',
+            data: $($("#formEdit")).serializeArray(),
+            dataType: 'json',
+            type: 'POST',
+            success: function (response)
+            {
+                debugger;
+                if (response.isError) {
+                    showError(response.message);
+                }
+                else {
+                       var url = '@Url.Action("Index", "Contact",  new { message = "Record saved successfully!" } )';
+                       window.location.href = url;
+                }
+            },
+            error: function (response)
+            {
+                showError(response.Message);
+            }
+        });
+    }
+
+
+
+
+    </script>
+}
+
+
