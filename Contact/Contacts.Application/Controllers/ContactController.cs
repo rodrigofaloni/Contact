@@ -1,4 +1,5 @@
 ﻿using Contacts.Application.Models;
+using Contacts.Application.Validations;
 using Contacts.Domain.Entity;
 using Contacts.Domain.Enumerator;
 using Contacts.Domain.Helper;
@@ -23,74 +24,88 @@ namespace Contacts.Application.Controllers
         // GET: Employee
         public IActionResult Index(string message)
         {
-            if(message != null) {
-                ViewBag.SucessMessage = message;
-            }
-
-            var listItens = _servico.ListContacts();
-
-            var listVwm = listItens.Select(u => new ContactVWM
+            try
             {
-                Id = u.Id,
-                Type = u.Person.Type,
-                NameExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Name : u.Person.LegalPerson.CompanyName,
-                DocumentExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Cpf : u.Person.LegalPerson.Cnpj,
-                ZipCode = u.Person.Address.ZipCode,
-                Country = u.Person.Address.Country,
-            });
+                if (message != null)
+                {
+                    ViewBag.SucessMessage = message;
+                }
 
-            return View(listVwm);
+                var listItens = _servico.ListContacts();
+
+                var listVwm = listItens.Select(u => new ContactVWM
+                {
+                    Id = u.Id,
+                    Type = u.Person.Type,
+                    NameExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Name : u.Person.LegalPerson.CompanyName,
+                    DocumentExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Cpf : u.Person.LegalPerson.Cnpj,
+                    ZipCode = u.Person.Address.ZipCode,
+                    Country = u.Person.Address.Country,
+                });
+
+                return View(listVwm);
+            }
+            catch (Exception erro)
+            {
+                return Json(new ValidateMessage { Message = erro.Message, IsError = true });
+            }
         }
 
-
-        // GET: Employee/Create
+        [HttpGet]
         public IActionResult AddOrEdit(int id = 0)
         {
-            var types = new List<EnumTypePerson>();
-            types.Add(EnumTypePerson.NATURAL);
-            types.Add(EnumTypePerson.LEGAL);
-            ViewBag.Types = types;
-
-            var genders = new List<EnumGender>();
-            genders.Add(EnumGender.MALE);
-            genders.Add(EnumGender.FEMALE);
-            ViewBag.Genders = genders;
-
-            ViewBag.Countries = HelperCountry.GetAllCountries();
-
-            if (id == 0)
+            try
             {
-                return View(new ContactVWM());
-            }
-            else
-            {
-                var dataBaseEntity = _servico.GetContact(id);
+                var types = new List<EnumTypePerson>();
+                types.Add(EnumTypePerson.NATURAL);
+                types.Add(EnumTypePerson.LEGAL);
+                ViewBag.Types = types;
 
-                var vwm = new ContactVWM { Id = dataBaseEntity.Id };
-                vwm.Type = dataBaseEntity.Person.Type;
+                var genders = new List<EnumGender>();
+                genders.Add(EnumGender.MALE);
+                genders.Add(EnumGender.FEMALE);
+                ViewBag.Genders = genders;
 
-                if (dataBaseEntity.Person.Type == EnumTypePerson.NATURAL)
+                ViewBag.Countries = HelperCountry.GetAllCountries();
+
+                if (id == 0)
                 {
-                    vwm.Name = dataBaseEntity.Person.NaturalPerson.Name;
-                    vwm.Birthday = dataBaseEntity.Person.NaturalPerson.Birthday;
-                    vwm.Gender = dataBaseEntity.Person.NaturalPerson.Gender;
-                    vwm.Cpf = dataBaseEntity.Person.NaturalPerson.Cpf;
+                    return View(new ContactVWM());
                 }
                 else
                 {
-                    vwm.CompanyName = dataBaseEntity.Person.LegalPerson.CompanyName;
-                    vwm.TradeName = dataBaseEntity.Person.LegalPerson.TradeName;
-                    vwm.Cnpj = dataBaseEntity.Person.LegalPerson.Cnpj;
+                    var dataBaseEntity = _servico.GetContact(id);
+
+                    var vwm = new ContactVWM { Id = dataBaseEntity.Id };
+                    vwm.Type = dataBaseEntity.Person.Type;
+
+                    if (dataBaseEntity.Person.Type == EnumTypePerson.NATURAL)
+                    {
+                        vwm.Name = dataBaseEntity.Person.NaturalPerson.Name;
+                        vwm.Birthday = dataBaseEntity.Person.NaturalPerson.Birthday;
+                        vwm.Gender = dataBaseEntity.Person.NaturalPerson.Gender;
+                        vwm.Cpf = dataBaseEntity.Person.NaturalPerson.Cpf;
+                    }
+                    else
+                    {
+                        vwm.CompanyName = dataBaseEntity.Person.LegalPerson.CompanyName;
+                        vwm.TradeName = dataBaseEntity.Person.LegalPerson.TradeName;
+                        vwm.Cnpj = dataBaseEntity.Person.LegalPerson.Cnpj;
+                    }
+
+                    vwm.ZipCode = dataBaseEntity.Person.Address.ZipCode;
+                    vwm.Country = dataBaseEntity.Person.Address.Country;
+                    vwm.State = dataBaseEntity.Person.Address.State;
+                    vwm.City = dataBaseEntity.Person.Address.City;
+                    vwm.AddressLine1 = dataBaseEntity.Person.Address.AddressLine1;
+                    vwm.AddressLine2 = dataBaseEntity.Person.Address.AddressLine2;
+
+                    return View(vwm);
                 }
-
-                vwm.ZipCode = dataBaseEntity.Person.Address.ZipCode;
-                vwm.Country = dataBaseEntity.Person.Address.Country;
-                vwm.State = dataBaseEntity.Person.Address.State;
-                vwm.City = dataBaseEntity.Person.Address.City;
-                vwm.AddressLine1 = dataBaseEntity.Person.Address.AddressLine1;
-                vwm.AddressLine2 = dataBaseEntity.Person.Address.AddressLine2;
-
-                return View(vwm);
+            }
+            catch (Exception erro)
+            {
+                return Json(new ValidateMessage { Message = erro.Message, IsError = true });
             }
         }
 
@@ -104,6 +119,8 @@ namespace Contacts.Application.Controllers
 
                 if (contact.Id == 0)
                 {
+                    ContactValidator validator = new ContactValidator(_servico);
+                    validator.InsertValidator(contact);
                     Contact newContact = new Contact { Id = nextId };
                     var person = new Person
                     {
@@ -149,6 +166,8 @@ namespace Contacts.Application.Controllers
                 }
                 else
                 {
+                    ContactValidator validator = new ContactValidator(_servico);
+                    validator.UpdateValidator(contact);
                     var dataBaseEntity = _servico.GetContact(contact.Id);
                     dataBaseEntity.Person.Type = contact.Type;
                     dataBaseEntity.Person.Address.ZipCode = contact.ZipCode;
@@ -205,9 +224,16 @@ namespace Contacts.Application.Controllers
         // GET: Employee/Delete/5
         public IActionResult Delete(int id)
         {
-            var employee = _servico.GetById(id);
-            _servico.Remove(employee);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var employee = _servico.GetById(id);
+                _servico.Remove(employee);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception erro)
+            {
+                return Json(new ValidateMessage { Message = erro.Message, IsError = true });
+            }
         }
     }
 }
