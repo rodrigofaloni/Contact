@@ -195,7 +195,7 @@ namespace Contacts.Application.Controllers
                 DocumentExibition = u.Person.Type == EnumTypePerson.NATURAL ? u.Person.NaturalPerson.Cpf : u.Person.LegalPerson.Cnpj,
                 ZipCode = u.Person.Address.ZipCode,
             });
-            return listContactVwm;
+            return listContactVwm.OrderBy(x => x.NameExibition);
         }
 
         /// <summary>
